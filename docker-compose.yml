@@ -1,0 +1,40 @@
+version: '1.0.0'
+services:
+  redis:
+    image: redis:latest
+    container_name: profit-redis
+    environment:
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_USER_PASSWORD=${REDIS_USER_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redisdata:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    restart: unless-stopped
+    networks:
+      profit-network:
+
+  profit-tasks:
+    build: src
+    container_name: profit-tasks
+    volumes:
+      - ./src/:/opt/app/
+    env_file:
+      - .env
+    networks:
+      profit-network:
+
+
+
+networks:
+  profit-network:
+    name: profit-network
+    driver: bridge
